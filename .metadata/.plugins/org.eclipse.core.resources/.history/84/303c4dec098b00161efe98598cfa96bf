@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class Client implements Runnable {
 
-	private Random random = new Random();
+	private Random random;
 	
 	@Override
 	public void run() {
@@ -19,22 +19,13 @@ public class Client implements Runnable {
 		
 	}
 	
-	public int generateIdentificationNumber(){		
+	public int generateIdentification(){
+		
 		return random.nextInt(100) + 1;
-	}
-	
-	public int generateAge(){
-		int max = 40;
-		int min = 18;
-		return random.nextInt((max - min) + 1) + min;
-
 	}
 
 	public static void main(String[]args){
 		Client c = new Client();
 		c.run();
-		//System.out.println(c.generateIdentificationNumber());
-		//System.out.println(c.generateAge());
-		
 	}
 }

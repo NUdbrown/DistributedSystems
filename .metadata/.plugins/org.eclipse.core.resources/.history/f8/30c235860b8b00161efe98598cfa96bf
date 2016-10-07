@@ -32,9 +32,9 @@ public class Client implements Runnable {
 
 	public static void main(String[]args){
 		Client c = new Client();
-		c.run();
-		//System.out.println(c.generateIdentificationNumber());
-		//System.out.println(c.generateAge());
+		//c.run();
+		System.out.println(c.generateIdentificationNumber());
+		System.out.println(c.generateAge());
 		
 	}
 }

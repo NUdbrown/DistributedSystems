@@ -11,7 +11,7 @@ import com.hallaLib.HallaStor;
 public class Server implements Runnable {
 
 	private Random random = new Random();
-
+	
 	public static void main(String[] args) {
 		Server s = new Server();
 		s.run();
@@ -24,9 +24,9 @@ public class Server implements Runnable {
 			while (true) {
 				Socket clientSocket = ss.accept();
 
-				BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
-
+				 BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		         PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
+				
 				String command = null;
 				String key = null;
 				Object objectAsVal = null;
@@ -34,9 +34,9 @@ public class Server implements Runnable {
 				case "update":
 					getStore().update(key, objectAsVal);
 					break;
-				case "add":
+				case "add":					
 					getStore().add(key, objectAsVal);
-
+				
 					break;
 				case "delete":
 					getStore().delete(key);
@@ -60,8 +60,8 @@ public class Server implements Runnable {
 		return HallaStor.getInstance();
 	}
 
-	public String generateKey(Object object) {
-
+	public String generateKey(Object object){	
+		
 		return null;
 	}
 }

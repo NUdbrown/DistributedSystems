@@ -1,0 +1,23 @@
+import java.io.IOException;
+import java.net.ServerSocket;
+
+public class Server {
+
+	public static void main (String [] args){
+		Server s = new Server();
+		s.run();
+	}
+
+	public void run() {
+		
+		try {
+			ServerSocket ss = new ServerSocket(3030);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+}

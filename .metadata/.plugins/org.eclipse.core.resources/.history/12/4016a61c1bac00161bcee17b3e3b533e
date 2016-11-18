@@ -1,0 +1,53 @@
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class Client {
+
+	public static void main (String [] args){
+		Client c = new Client();
+		c.run();
+	}
+
+	public void run() {
+		
+		
+	}
+	
+	//writing
+	public void writeRacecar(Racecar car, OutputStream out) throws IOException{
+		
+		//send car id
+		out.write(car.getId());
+		//get/send length of make
+		int lengthOfMake = car.getMake().length();
+		out.write(lengthOfMake);
+		//send length of model
+		int lengthOfModel = car.getModel().length();
+		out.write(lengthOfModel);
+		//send chars of make
+		byte [] carMakeBytes = car.getMake().getBytes();
+		out.write(carMakeBytes);
+		//send chars of model
+		byte [] carModelBytes = car.getModel().getBytes();
+		out.write(carModelBytes);
+		//send horsepwr
+		
+		//send quartermile
+				
+		
+	}
+	
+	public void writeDriver(Driver d, OutputStream out) throws IOException{
+		//send id
+		out.write(d.getId());
+		//Send lengthOfName
+		int lengthOfName = d.getName().length();
+		out.write(lengthOfName);
+		//send Name
+		
+		//send age
+		out.write(d.getAge());
+		//send isMale
+	}
+	
+}

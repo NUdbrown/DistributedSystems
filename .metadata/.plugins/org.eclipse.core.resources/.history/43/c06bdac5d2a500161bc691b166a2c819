@@ -1,0 +1,94 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
+
+public class Client implements Runnable {
+
+	private Random random = new Random();
+	private Serializer serialize = new Serializer();
+	private List<Objects> listOfObjects;
+	@Override
+	public void run() {
+		listOfObjects = new ArrayList<Objects>();
+		Driver driver = null;
+		Racecar racecar = null;
+		int id = generateIdentificationNumber();
+		int index = 1;
+		try {
+			// System.out.println("Choose operation:");
+			// Scanner scan = new Scanner(System.in);
+			// String input = scan.nextLine();
+			// if(input.toLowerCase().equals("add")){
+			// for(int i = 0; i <= 100; i++){
+			Socket socket = new Socket("localhost", 3000);
+
+			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+			oos.write(serialize.serializeEnum(CrudOperations.ADD));
+			if (random.nextBoolean() == true) {
+				driver = new Driver(id, "Jessie" + index, generateAge(), random.nextBoolean());
+				oos.writeObject(driver);
+			} else {
+				racecar = new Racecar(id, "BMW", "XO", 3000, generateQMT());
+				oos.writeObject(racecar);
+			}
+			index++;
+			oos.flush();
+			while (true) {
+
+			}
+			// }
+
+			// }
+
+		} catch (SocketException e) {
+			System.out.println("socket probably finished and closed - client side");
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public int generateIdentificationNumber() {
+		return random.nextInt(200) + 1;
+	}
+
+	public int generateAge() {
+		int max = 40;
+		int min = 18;
+		return random.nextInt((max - min) + 1) + min;
+
+	}
+
+	public double generateQMT() {
+		return random.nextDouble() + 1;
+	}
+	
+	public void printListOfObjects(){
+		for(Object o : listOfObjects){
+			if(o instanceof Driver){
+				System.out.println(((Driver) o).getId() + " : " + ((Driver)o).getName());
+			}else{
+				System.out.println(((Racecar)o).getId() + " : " + ((Racecar)o).getMake());
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		Client c = new Client();
+		c.run();
+		// System.out.println(c.generateIdentificationNumber());
+		// System.out.println(c.generateAge());
+
+	}
+}

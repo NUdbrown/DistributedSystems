@@ -1,0 +1,7 @@
+
+public enum CrudOperations {
+	ADD("1"),
+	DEL("2"),
+	UPDATE("3"),
+	GET("4")
+}

@@ -1,0 +1,59 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Server {
+
+	public static void main (String [] args){
+		Server s = new Server();
+		s.run();
+	}
+
+	public void run() {
+//		int [] contents = new int [10];
+		try {
+			ServerSocket ss = new ServerSocket(3030);
+			boolean done = false;
+			Socket client = ss.accept();
+			System.out.println("I've accepted");
+			DataInputStream input = new DataInputStream(client.getInputStream());
+			DataOutputStream output = new DataOutputStream(client.getOutputStream());
+			while(!done && input.available() > 0){
+				
+				byte ops = input.readByte();				
+				switch(ops){
+					case 1:
+//						int i = 0;
+						int theNum = input.readInt();
+						System.out.println("READ: " + theNum);	
+//						contents[i] = theNum;
+//						i++;
+						break;
+				}
+				
+				int acceptMsg = 5;				
+				output.writeInt(acceptMsg);
+				output.flush();
+				System.out.println("I've sent accepted request");
+				
+				String lastMsg = input.readUTF();
+				System.out.println("Ive read the last msg");
+				if(lastMsg.toLowerCase().equals("done")){
+					done = true;
+				}
+				
+				
+			}
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+}

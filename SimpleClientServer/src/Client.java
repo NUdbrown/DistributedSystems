@@ -4,131 +4,153 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Client {
 	private Random random;
+	private ArrayList<String> listOfObjects = new ArrayList<String>();
 	
-	public static void main (String [] args){
+	public static void main(String[] args) {
 		Client c = new Client();
 		c.run();
 	}
 
 	public void run() {
 		random = new Random();
-		
 		try {
-			for(int i = 1; i <= 1; i++){
+			for (int i = 1; i <= 25; i++) {
 				Socket s = new Socket("localhost", 3030);
 				DataOutputStream output = new DataOutputStream(s.getOutputStream());
 				DataInputStream input = new DataInputStream(s.getInputStream());
-				//write operation
+				// random decision car or driver
+				int choiceOfObj = random.nextInt(2);
+				// write operation
 				output.writeByte(1);
 				output.flush();
-				//write data wanting to send
-				
-
+				// set up car or driver
+				if (choiceOfObj == 0) {
+					output.write(0);
+					writeRacecar(createCar(), output);
+				} else {
+					output.write(1);
+					writeDriver(createDriver(), output);
+				}
+				// write data wanting to send
 
 				int returnMsg = input.readInt();
-				if(returnMsg != 0){
-					System.out.println(returnMsg + "\ncount at " + i);	
-					output.writeUTF("Done");
+				if (returnMsg == 5) {
+					System.out.println(returnMsg + "\ncount at " + i);
+					String keyOfItem = input.readUTF();
+					listOfObjects.add(keyOfItem);
+					System.out.println("Ive add the new key and Im done!");
+					output.writeUTF("done");
 					output.flush();
-					System.out.println("Ive sent the done!");
-					s.close();				
-				}				
+					//close everything
+					output.close();
+					input.close();
+					s.close();
+					printList();
+				}
 
 			}
-			
-			
-			
+
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-		
-		
-	}
-	public void writeObject(Object o, OutputStream out) throws IOException{
-		if(o instanceof Racecar){
-			out.write(1);
-			createCar(out);
-		}else{
-			out.write(0);
-			writeDriver(createDriver(), out);
 		}
-	}
-	
-	private void createCar(OutputStream out) throws IOException {
-		Racecar car = new Racecar(generateId(), "BMW", "SLXR", generateHorsePower(), generateQuarterMileTime());
-		writeRacecar(car, out); 
-	}
-	
-	private Driver createDriver(){
-		int index = 0;
-		String name = "";
-		if(random.nextBoolean() == false){
-			name = "DanTheMan";
-		}else{
-			name = "SherlTheGirl";
-		}
-		return new Driver(generateId(), name + index++, 30,random.nextBoolean());
+
 	}
 
-	//writing
-	public void writeRacecar(Racecar car, OutputStream out) throws IOException{
-		
-		//send car id
-		out.write(car.getId());
-		out.flush();
-		//send length of make
-		out.write(car.getMake().length());
-		out.flush();
-		//send length of model
-		out.write(car.getModel().length());
-		out.flush();
-		//send chars of make
-		out.write(car.getMake().getBytes());
-		out.flush();
-		//send chars of model
-		out.write(car.getModel().getBytes());
-		out.flush();
-		//send horsepower
-		out.write(car.getHorsePower());
-		out.flush();
-		//send quarter-mile
-		out.write(car.getHorsePower());
-		out.flush();
-				
+	private void printList() {
+		int index = 1;
+		for(String item : listOfObjects){			
+			System.out.println(index + ": " + item);
+			index++;
+		}
 		
 	}
-	
-	public void writeDriver(Driver d, OutputStream out) throws IOException{
-		//send id
-		out.write(d.getId());
-		//Send lengthOfName
-		out.write(d.getName().length());
-		//send Name
-		out.write(d.getName().getBytes());
-		//send age
-		out.write(d.getAge());
-		//send isMale
-		if(d.isMale() == true){
-			out.write(1);
-		}else
-			out.write(0);
+
+	private Racecar createCar() {
+		return new Racecar(generateId(), "BMW", "SLXR",
+				generateHorsePower(), generateQuarterMileTime());
 	}
-	
+
+	private Driver createDriver() {
+		int index = 0;
+		boolean isMale;
+		String name = "";
+		if (random.nextBoolean() == false) {
+			name = "DanTheMan";
+			isMale = true;
+		} else {
+			name = "SherlTheGirl";
+			isMale = false;
+		}
+		return new Driver(generateId(), name + index++,
+				generateAge(), random.nextBoolean());
+	}
+
+	// writing
+	public void writeRacecar(Racecar car, DataOutputStream out) throws IOException {
+		System.out.println("sending car info");
+		// send car id
+		out.writeInt(car.getId());
+		out.flush();
+		// send make		
+		out.writeUTF(car.getMake());
+		out.flush();
+		// send model
+		out.writeUTF(car.getModel());
+		out.flush();
+		// send horsepower
+		out.writeInt(car.getHorsePower());
+		out.flush();
+		// send quarter-mile
+		out.writeDouble(car.getQuarterMileTime());
+		out.flush();
+		System.out.println("sent all of car info");
+
+	}
+
+	public void writeDriver(Driver d, DataOutputStream out) throws IOException {
+		System.out.println("sending all of driver info");
+		// send id
+		out.writeInt(d.getId());
+		out.flush();
+		// send Name
+		out.writeUTF(d.getName());
+		out.flush();
+		// send age
+		out.writeInt(d.getAge());
+		out.flush();
+		// send isMale
+		out.writeBoolean(d.isMale());
+		out.flush();
+		System.out.println("sent all of driver");
+	}
+
 	private int generateQuarterMileTime() {
-		return random.nextInt(5)+1;
+		return random.nextInt(5) + 1;
 	}
-	
+
 	private int generateHorsePower() {
-		return random.nextInt(1500)+1;
+		return random.nextInt(1500) + 1;
 	}
-	
+
 	private int generateId() {
 		return random.nextInt(200);
 	}
+	
+	private int generateAge(){
+		int max = 55;
+		int min = 25;
+		return  random.nextInt((max - min) + 1) + min;
+	}
+
+	public ArrayList<String> getListOfObjects() {
+		return listOfObjects;
+	}
+
 }

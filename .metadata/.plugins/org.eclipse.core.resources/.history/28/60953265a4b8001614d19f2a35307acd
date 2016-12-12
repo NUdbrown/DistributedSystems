@@ -1,0 +1,120 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import com.hallaLib.HallaStor;
+
+public class MultithreadedServer implements Runnable{
+	private Socket clientSocket;
+	private HallaStor store = HallaStor.getInstance();
+	
+	public MultithreadedServer(Socket clientSocket) {
+		super();
+		this.clientSocket = clientSocket;
+	}
+
+	public static void main (String [] args){
+		try{
+			ServerSocket ssSocket = new ServerSocket(3030);
+		      System.out.println("Listening");
+		      while (true) {
+		         Socket sock = ssSocket.accept();
+		         System.out.println("Connected");
+		         new Thread(new MultithreadedServer(sock)).start();
+		         }
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	public void run() {
+		try {
+			boolean done = false;
+			while(!done){
+				DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+				DataOutputStream output = new DataOutputStream(clientSocket.getOutputStream());
+				String response = null;
+					byte ops = input.readByte();				
+					switch(ops){
+					case 1:
+						byte theNum = input.readByte();					
+						if(theNum == 0){
+							int carID = input.readInt();
+							String make = input.readUTF();
+							String model = input.readUTF();
+							int hp = input.readInt();
+							double qmt = input.readDouble();
+							response = addCarToHallaStor(carID, make, model, hp, qmt);
+						}else if(theNum == 1){
+							int driverID = input.readInt();
+							String name = input.readUTF();						
+							int age = input.readInt();
+							boolean isMale = input.readBoolean();
+							response = addDriverToHallaStor(driverID, name, age, isMale);
+						}
+						break;
+					case 2:
+						byte choice = input.readByte();
+						if(choice == 0){
+							String carKey = input.readUTF();
+							deleteCar(carKey);
+							response = carKey;
+						}else{
+							String driverKey = input.readUTF();
+							deleteDriver(driverKey);
+							response = driverKey;
+						}
+						break;
+					case 3:
+						break;
+					}
+					
+					int acceptMsg = 5;				
+					output.writeInt(acceptMsg);					
+					output.flush();
+					System.out.println("I've sent accepted request");
+					output.writeUTF(response);
+					output.flush();
+					System.out.println("I've sent accepted response");
+					
+					String lastMsg = input.readUTF();
+					System.out.println("Ive read the last msg");
+					if(lastMsg.toLowerCase().equals("done")){
+						
+					}				
+			}					
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public String addCarToHallaStor(int id, String make, String model, int horsePower, double quarterMileTime){
+		int index = 1;
+		String key = "car" + index;
+		store.add(key, new Racecar(id, make, model, horsePower, quarterMileTime));
+		
+		return key;
+	}
+	
+	public String addDriverToHallaStor(int id, String name,int age, boolean isMale){
+		int index = 1;
+		String key = "car" + index;
+		store.add(key, new Driver(id, name, age, isMale));
+		
+		return key;
+	}
+	
+	public void deleteDriver(String key){
+		store.delete(key);
+	}
+	
+	public void deleteCar(String key){
+		store.delete(key);
+	}
+	
+}

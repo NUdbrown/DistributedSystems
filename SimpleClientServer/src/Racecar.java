@@ -15,9 +15,9 @@ public class Racecar implements Serializable {
 
     private int horsePower;
 
-    private int quarterMileTime;
+    private double quarterMileTime;
     
-	public Racecar(int id, String make, String model, int horsePower, int quarterMileTime) {
+	public Racecar(int id, String make, String model, int horsePower, double quarterMileTime) {
 		this.id = id;
 		this.make = make;
 		this.model = model;
